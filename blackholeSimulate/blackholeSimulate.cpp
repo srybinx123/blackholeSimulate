@@ -182,8 +182,7 @@ int main()
     PostProcessPass passthrough("shader/passthrough.frag");
 
     GLuint galaxy = loadTextureCubeMap("assets/skybox_nebula_dark");
-    GLuint colorMap = loadTexture2D("assets/color_map.png");
-    GLuint uvChecker = loadTexture2D("assets/uv_checker.png");
+    //GLuint colorMap = loadTexture2D("assets/color_map.png");
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -205,7 +204,7 @@ int main()
             RendertoTextureInfo rtti;
             rtti.fragShader = "shader/blackhole_main.frag";
             rtti.cubemapUniforms["galaxy"] = galaxy;
-            rtti.textureUniforms["colorMap"] = colorMap;
+            //rtti.textureUniforms["colorMap"] = colorMap;
             rtti.floatUniforms["mouseX"] = mouseX;
             rtti.floatUniforms["mouseY"] = mouseY;
             rtti.floatUniforms["fovScale"] = fovScale;

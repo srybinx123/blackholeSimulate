@@ -13,7 +13,7 @@ uniform float fovScale;
 
 uniform float time; // time elapsed in seconds
 uniform samplerCube galaxy;
-uniform sampler2D colorMap;
+// uniform sampler2D colorMap;
 
 uniform float frontView = 0.0;
 uniform float topView = 0.0;
@@ -259,7 +259,7 @@ mat3 lookAt(vec3 origin, vec3 target, float roll) {
 
 float sqrLength(vec3 a) { return dot(a, a); }
 
-void adiskColor(vec3 pos, inout vec3 color, inout float alpha) {
+void adiskColor(vec3 pos, inout vec3 color, inout float alpha, vec2 uv) {
   float innerRadius = 2.6;
   float outerRadius = 12.0;
 
@@ -306,15 +306,25 @@ void adiskColor(vec3 pos, inout vec3 color, inout float alpha) {
       sphericalCoord.y -= time * adiskSpeed;
     }
   }
-
   vec3 dustColor =
-      texture(colorMap, vec2(sphericalCoord.x / outerRadius, 0.5)).rgb;
-      // vec3(sphericalCoord.x / outerRadius, 0.0, 0.0);
+      // texture(colorMap, vec2(sphericalCoord.x / outerRadius, 0.5)).rgb;
+      vec3(sphericalCoord.x / outerRadius, 0.1, sphericalCoord.x / outerRadius);
+  float r = uv.x * cos(cameraRoll * 3.14159 / 180.0)
+      - uv.y * sin(cameraRoll * 3.14159 / 180.0);
+  r = r * fovScale;
+  if (r < 0.0) 
+  {
+    dustColor = vec3(0.2, 0.2, sphericalCoord.x / outerRadius * -r + 0.2);
+  }
+  else 
+  {
+    dustColor = vec3(sphericalCoord.x / outerRadius * r + 0.2, 0.2, 0.2);
+  }
 
   color += density * adiskLit * dustColor * alpha * abs(noise);
 }
 
-vec3 traceColor(vec3 pos, vec3 dir) {
+vec3 traceColor(vec3 pos, vec3 dir, vec2 uv) {
   vec3 color = vec3(0.0);
   float alpha = 1.0;
 
@@ -341,7 +351,7 @@ vec3 traceColor(vec3 pos, vec3 dir) {
       float minDistance = INFINITY;
 
       if (adiskEnabled > 0.5) {
-        adiskColor(pos, color, alpha);
+        adiskColor(pos, color, alpha, uv);
       }
     }
 
@@ -382,5 +392,5 @@ void main() {
   vec3 pos = cameraPos;
   dir = view * dir;
 
-  fragColor.rgb = traceColor(pos, dir);
+  fragColor.rgb = traceColor(pos, dir, uv);
 }
