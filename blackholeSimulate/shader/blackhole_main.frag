@@ -359,7 +359,7 @@ vec3 traceColor(vec3 pos, vec3 dir, vec2 uv) {
   }
 
   // Sample skybox color
-  dir = rotateVector(normalize(pos), vec3(0.0, 1.0, 0.0), time);
+  dir = rotateVector(normalize(dir), vec3(0.0, 1.0, 0.0), time);
   color += texture(galaxy, dir).rgb * alpha;
   return color;
 }
