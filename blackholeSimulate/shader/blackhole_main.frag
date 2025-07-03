@@ -259,7 +259,7 @@ mat3 lookAt(vec3 origin, vec3 target, float roll) {
 
 float sqrLength(vec3 a) { return dot(a, a); }
 
-void adiskColor(vec3 pos, inout vec3 color, inout float alpha, vec2 uv) {
+void adiskColor(vec3 pos, inout vec3 color, inout float alpha, vec2 uv, vec3 oripos) {
   float innerRadius = 2.6;
   float outerRadius = 12.0;
 
@@ -306,20 +306,32 @@ void adiskColor(vec3 pos, inout vec3 color, inout float alpha, vec2 uv) {
       sphericalCoord.y -= time * adiskSpeed;
     }
   }
-  vec3 dustColor =
-      // texture(colorMap, vec2(sphericalCoord.x / outerRadius, 0.5)).rgb;
-      vec3(sphericalCoord.x / outerRadius, 0.1, sphericalCoord.x / outerRadius);
-  float r = uv.x * cos(cameraRoll * 3.14159 / 180.0)
-      - uv.y * sin(cameraRoll * 3.14159 / 180.0);
-  r = r * fovScale;
-  if (r < 0.0) 
-  {
-    dustColor = vec3(0.2, 0.2, sphericalCoord.x / outerRadius * -r + 0.2);
-  }
-  else 
-  {
-    dustColor = vec3(sphericalCoord.x / outerRadius * r + 0.2, 0.2, 0.2);
-  }
+  // vec3 dustColor =
+  //     // texture(colorMap, vec2(sphericalCoord.x / outerRadius, 0.5)).rgb;
+  //     vec3(sphericalCoord.x / outerRadius, 0.1, sphericalCoord.x / outerRadius);
+  // float r = uv.x * cos(cameraRoll * 3.14159 / 180.0)
+  //     - uv.y * sin(cameraRoll * 3.14159 / 180.0);
+  // r = r * fovScale;
+  // if (r < 0.0) 
+  // {
+  //   dustColor = vec3(0.2, 0.2, sphericalCoord.x / outerRadius * -r + 0.2);
+  // }
+  // else 
+  // {
+  //   dustColor = vec3(sphericalCoord.x / outerRadius * r + 0.2, 0.2, 0.2);
+  // }
+
+  
+  oripos = normalize(oripos);
+  vec3 v1 = 0.0 - oripos;
+  vec3 v2 = normalize(pos);
+  // vec3 v2 = pos - oripos;
+  // vec3 normal = normalize(cross(v1, v2));
+  float invariance = dot(vec3(0.0, 1.0, 0.0), cross(v1, v2));
+  float sgn = sign(invariance);
+  invariance = abs(invariance);
+  invariance = pow(invariance, 0.7);
+  vec3 dustColor = vec3(0.5 - sphericalCoord.x / outerRadius * invariance * 0.5 * sgn, 0.5 - sphericalCoord.x / outerRadius * invariance * 0.5, 0.5 + sphericalCoord.x / outerRadius * invariance * 0.5 * sgn);
 
   color += density * adiskLit * dustColor * alpha * abs(noise);
 }
@@ -327,6 +339,7 @@ void adiskColor(vec3 pos, inout vec3 color, inout float alpha, vec2 uv) {
 vec3 traceColor(vec3 pos, vec3 dir, vec2 uv) {
   vec3 color = vec3(0.0);
   float alpha = 1.0;
+  vec3 oripos = pos;
 
   float STEP_SIZE = 0.1;
   dir *= STEP_SIZE;
@@ -351,7 +364,7 @@ vec3 traceColor(vec3 pos, vec3 dir, vec2 uv) {
       float minDistance = INFINITY;
 
       if (adiskEnabled > 0.5) {
-        adiskColor(pos, color, alpha, uv);
+        adiskColor(pos, color, alpha, uv, oripos);
       }
     }
 
