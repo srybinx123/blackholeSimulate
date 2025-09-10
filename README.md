@@ -7,3 +7,6 @@
 
  - 2025.03.23   添加了多普勒效应的模拟
  - 2025.07.03   修复了多普勒红移和蓝移在camera roll不同取值时可能出现反转的问题
+ - 2025.07.18   制作webGL版本，并发布创意工坊
+   - [web demo](https://srybinx123.github.io/blackhole-WebGL/)
+   - [steam 创意工坊](https://steamcommunity.com/sharedfiles/filedetails/?id=3519301874) 
